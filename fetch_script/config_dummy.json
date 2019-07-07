@@ -1,0 +1,10 @@
+[
+	{
+		"appId": "your app id here",
+		"key":"your key here",
+		"uniqueId": "1",
+		"description": "your description here",
+		"locationName": "Berlin"
+
+	}
+]

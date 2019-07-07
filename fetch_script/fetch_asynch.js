@@ -9,7 +9,6 @@ const config = require('./config.json'),
   // eslint-disable-next-line no-unused-vars
   db = require('./db');
 
-
 async function main () {
   await Promise.all(config.map(async (el) => {
 
@@ -29,7 +28,6 @@ async function main () {
             // Device found, saving only payload
             console.log('Device found');
             await savePayload(device._id, payload.metadata.time, payload.payload_fields);
-            console.log('Payload saved');
 
           } else {
             // device not found, creating new device and save payload;
@@ -39,7 +37,9 @@ async function main () {
           }
         } else {
           console.log('App not found!');
-          await saveApp(el);
+          let app = await saveApp(el);
+          let device = await saveDevice(app._id, devID, payload.hardware_serial);
+          await savePayload(device._id, payload.metadata.time, payload.payload_fields);
 
         }
 
@@ -55,9 +55,10 @@ async function main () {
  * @returns {Object} If present, returns app. If not, returns undefined
  */
 const appExists = (id) => {
-  return AppModel.findOne({'appId': id})
+  return AppModel.findOne({'uniqueId': id})
     .exec()
     .then((app) =>{
+      console.log('looking for app with unique id' + id);
       return app;
     })
     .catch((err) => {
@@ -123,13 +124,13 @@ function saveDevice(appId, devId, hardwareSerial) {
 
   return Device.save()
     .then((device) => {
+      console.log('Saved new device ' + devId + 'to App with Id ' + appId);
       return device;
     }).catch((err) => {
       return err;
     });
 
 }
-
 
 /**
  * Saves a payload with the according device, time and values
