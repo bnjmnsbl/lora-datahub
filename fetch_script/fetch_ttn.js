@@ -5,8 +5,8 @@ const ttn = require('ttn');
 
 const config = require('./config.json'),
   AppModel = require('../models/App'),
-  DeviceModel = require('../models/App'),
-  PayloadModel = require('../models/App'),
+  DeviceModel = require('../models/Device'),
+  PayloadModel = require('../models/Payload'),
   // eslint-disable-next-line no-unused-vars
   db = require('./db');
 
@@ -25,60 +25,85 @@ config.forEach((el) => {
             console.log('App not found, creating new entry');
 
             // create a new app entry in DB - the first time it runs, no devices will be saved
-            let data = {
+            let appData = {
               'appId': el.appId,
               'uniqueId': el.uniqueId,
               'description:': el.description,
               'locationName': el.locationName
             };
-            let App = new AppModel(data);
+            let App = new AppModel(appData);
 
             App.save(function(err, doc) {
               if (err) throw err;
               console.log('Saved new App ' + doc.appId);
             });
 
+            let deviceData = {
+              'parentApp': App._id,
+              'devId': devId,
+              'hardwareSerial': payload.hardware_serial
+            };
+
+            let Device = new DeviceModel(deviceData);
+
+            Device.save(function(err, dev) {
+              if (err) throw err;
+              console.log('Device saved succesfully' + dev);
+            });
+
+            let payloadData = {
+              'parentDevice': Device._id,
+              'timestamp': payload.metadata.time,
+              'payload': payload.payload_fields
+            };
+
+            let Pay = new PayloadModel(payloadData);
+
+            Pay.save(function(err, pay) {
+              console.log('Initial Payload saved: ' + pay);
+            });
           } else {
             //app found, check if device exists
-            DeviceModel.find({'parentId': app._id}, function(err, device){
+            console.log('App found in DB');
+            DeviceModel.findOne({'parentId': app._id, 'devId': devId}, function(err, device){
               if (err) throw err;
 
-              if (!device.length) { //contrary to findOne, find will return true for empty arrays
-
+              if (!device) {
                 //device not found, create new device
-                console.log('Device not found: ' + device);
+                console.log('Device not found');
 
-                let data = {
+                let deviceData = {
                   'parentApp': app._id,
                   'devId': devId,
                   'hardwareSerial': payload.hardware_serial
                 };
-                let Device = new DeviceModel(data);
+                let Device = new DeviceModel(deviceData);
 
                 Device.save(function(err, dev) {
                   if (err) throw err;
                   console.log('Device saved succesfully' + dev);
+
+                  // save initial payload together with device
+                  let payloadData = {
+                    'parentDevice': Device._id,
+                    'timestamp': payload.metadata.time,
+                    'payload': payload.payload_fields
+                  };
+
+                  let Pay = new PayloadModel(payloadData);
+
+                  Pay.save(function(err, pay) {
+                    console.log('Initial Payload saved: ' + pay);
+                  });
                 });
-
-                //save initial payload together with device
-                let payloadData = {
-                  'parentDevice': Device._id,
-                  'timestamp': app.metadata.time,
-                  'payload': app.payload_fields
-                };
-
-                let Pay = new PayloadModel(payloadData);
-
-                Pay.save(function(err, pay) {
-                  console.log('Initial Payload saved: ' + pay);
-                });
-
               } else {
+                //Device found, saving only payload
                 console.log('Device found!');
+
                 let payloadData = {
                   'parentDevice': device._id,
-                  'timestamp': app.metadata.time,
-                  'payload': app.payload_fields
+                  'timestamp': payload.metadata.time,
+                  'payload': payload.payload_fields
                 };
 
                 let Pay = new PayloadModel(payloadData);
