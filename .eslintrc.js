@@ -4,12 +4,13 @@ module.exports = {
       'eslint:recommended',
     ],
     parserOptions: {
-      'ecmaVersion': 6
+      'ecmaVersion': 2017
     },
     plugins: [],
     env: {
       browser: true,
-      node: true
+      node: true,
+      es6: true
     },
     globals: {
     },

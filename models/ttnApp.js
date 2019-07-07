@@ -1,3 +1,5 @@
+// this file is deprecated
+
 const mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 

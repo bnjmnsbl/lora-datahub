@@ -4,7 +4,9 @@ require('dotenv').config();
 const ttn = require('ttn');
 
 const config = require('./config.json'),
-  appModel = require('../models/ttnApp'),
+  AppModel = require('../models/App'),
+  DeviceModel = require('../models/App'),
+  PayloadModel = require('../models/App'),
   // eslint-disable-next-line no-unused-vars
   db = require('./db');
 
@@ -12,22 +14,96 @@ config.forEach((el) => {
 
   ttn.data(el.appId, el.key)
     .then((client)=> {
-      console.log('connected: ' + el.appId);
+      console.log('connected to ' + el.appId);
 
       client.on('uplink', (function(devId, payload) {
-        console.log('received uplink from ' + devId + ' . Saving to DB...');
-        console.dir(payload);
+        console.log('received uplink from ' + devId);
+        console.log(payload);
+        //check if app id already exists
+        AppModel.findOne({'uniqueId': el.uniqueId}, function(err, app) {
+          if (!app) {
+            console.log('App not found, creating new entry');
 
-        let data = {
-          app: payload
-        };
-        let newApp = new appModel(data);
+            // create a new app entry in DB - the first time it runs, no devices will be saved
+            let data = {
+              'appId': el.appId,
+              'uniqueId': el.uniqueId,
+              'description:': el.description,
+              'locationName': el.locationName
+            };
+            let App = new AppModel(data);
 
-        newApp.save(function(err, data) {
-          if (err) throw err;
-          console.log('Saved to DB' + data);
+            App.save(function(err, doc) {
+              if (err) throw err;
+              console.log('Saved new App ' + doc.appId);
+            });
+
+          } else {
+            //app found, check if device exists
+            DeviceModel.find({'parentId': app._id}, function(err, device){
+              if (err) throw err;
+
+              if (!device.length) { //contrary to findOne, find will return true for empty arrays
+
+                //device not found, create new device
+                console.log('Device not found: ' + device);
+
+                let data = {
+                  'parentApp': app._id,
+                  'devId': devId,
+                  'hardwareSerial': payload.hardware_serial
+                };
+                let Device = new DeviceModel(data);
+
+                Device.save(function(err, dev) {
+                  if (err) throw err;
+                  console.log('Device saved succesfully' + dev);
+                });
+
+                //save initial payload together with device
+                let payloadData = {
+                  'parentDevice': Device._id,
+                  'timestamp': app.metadata.time,
+                  'payload': app.payload_fields
+                };
+
+                let Pay = new PayloadModel(payloadData);
+
+                Pay.save(function(err, pay) {
+                  console.log('Initial Payload saved: ' + pay);
+                });
+
+              } else {
+                console.log('Device found!');
+                let payloadData = {
+                  'parentDevice': device._id,
+                  'timestamp': app.metadata.time,
+                  'payload': app.payload_fields
+                };
+
+                let Pay = new PayloadModel(payloadData);
+                Pay.save(function(err, pay) {
+                  console.log('Payload added: ' + pay);
+                });
+              }
+            });
+          }
         });
       }));
     });
 });
 
+/**
+ * Async function that checks if the TTN App from config is already in the MongoDB Collection. Returns a boolean
+ * @param {String} uniqueId Unique ID of the TTN App
+ */
+
+// function AppExistsinDB(uniqueId) {
+//   return new Promise(function(reject, resolve) {
+//     AppModel.findOne({'uniqueId': uniqueId}, function(err, sensor) {
+//       if (!sensor) resolve('1');
+//       else if (err) reject(err);
+//       else return resolve('0');
+//     });
+//   });
+// }
