@@ -19,12 +19,12 @@ config.forEach((el) => {
       client.on('uplink', (function(devId, payload) {
         console.log('received uplink from ' + devId);
         console.log(payload);
+
         //check if app id already exists
         AppModel.findOne({'uniqueId': el.uniqueId}, function(err, app) {
           if (!app) {
             console.log('App not found, creating new entry');
 
-            // create a new app entry in DB - the first time it runs, no devices will be saved
             let appData = {
               'appId': el.appId,
               'uniqueId': el.uniqueId,
@@ -65,7 +65,8 @@ config.forEach((el) => {
           } else {
             //app found, check if device exists
             console.log('App found in DB');
-            DeviceModel.findOne({'parentId': app._id, 'devId': devId}, function(err, device){
+
+            DeviceModel.findOne({'parentApp': app._id, 'devId': devId}, function(err, device){
               if (err) throw err;
 
               if (!device) {
