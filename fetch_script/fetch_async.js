@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({path:__dirname+'/./../.env'});
 
 const ttn = require('ttn');
 
@@ -8,6 +8,7 @@ const config = require('./config.json'),
   PayloadModel = require('../models/Payload'),
   // eslint-disable-next-line no-unused-vars
   db = require('./db');
+
 
 async function main () {
   await Promise.all(config.map(async (el) => {
@@ -30,7 +31,7 @@ async function main () {
             await savePayload(device._id, payload.metadata.time, payload.payload_fields);
 
           } else {
-            // device not found, creating new device and save payload;
+            // Device not found, creating new device and save payload;
             console.log('Device not found');
             let device = await saveDevice(app._id, devID, payload.hardware_serial);
             await savePayload(device._id, payload.metadata.time, payload.payload_fields);
