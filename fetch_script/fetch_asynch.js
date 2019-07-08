@@ -40,10 +40,7 @@ async function main () {
           let app = await saveApp(el);
           let device = await saveDevice(app._id, devID, payload.hardware_serial);
           await savePayload(device._id, payload.metadata.time, payload.payload_fields);
-
         }
-
-
       });
   }));
 }
