@@ -6,7 +6,7 @@ let AppSchema = new Schema ({
   uniqueId: {type: String, required: true},
   description: {type: String},
   locationName: {type: String},
-  devices: [{type: Schema.Types.ObjectId, ref: 'Payload'}]
+  user: {type: String}
 });
 
 module.exports = mongoose.model('App', AppSchema);

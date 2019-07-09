@@ -90,8 +90,9 @@ function saveApp(el) {
   let appData = {
     'appId': el.appId,
     'uniqueId': el.uniqueId,
-    'description:': el.description,
-    'locationName': el.locationName
+    'description': el.description,
+    'locationName': el.locationName,
+    'user': el.user
   };
 
   let App = new AppModel(appData);
