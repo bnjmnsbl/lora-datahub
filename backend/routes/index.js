@@ -21,7 +21,14 @@ const routes = [
     method: 'GET',
     url: '/api/payloads/:id',
     handler: controller.getPayloadsforDevice
+  },
+  {
+    method: 'GET',
+    url: '/:uid',
+    handler: controller.handle404
   }
+
+
 ];
 
 module.exports = routes;

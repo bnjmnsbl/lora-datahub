@@ -44,3 +44,12 @@ exports.getPayloadsforDevice = async (req, reply) => {
     throw boom.boomify(err);
   }
 };
+
+exports.handle404 = async (req, reply) => {
+  try {
+    return boom.notFound('404 not found');
+  } catch (err) {
+    throw boom.boomify(err);
+  }
+
+};

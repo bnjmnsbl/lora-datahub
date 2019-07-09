@@ -9,11 +9,10 @@ const fastify = require('fastify')({
   logger: true
 });
 
-
+// Regist CORS
+fastify.register(require('fastify-cors'), {});
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options);
-
-
 
 const routes = require('./routes');
 
@@ -23,11 +22,6 @@ routes.forEach((route) => {
 
 // eslint-disable-next-line no-unused-vars
 const db = require('../fetch_script/db');
-
-// Declare a route
-fastify.get('/', async (request, reply) => {
-  return { hello: 'world' };
-});
 
 // Run the server!
 const start = async () => {
