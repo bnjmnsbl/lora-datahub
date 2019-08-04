@@ -26,8 +26,12 @@ const routes = [
     method: 'GET',
     url: '/:uid',
     handler: controller.handle404
+  },
+  {
+    method: 'POST',
+    url: '/api/users',
+    handler: controller.addNewUser
   }
-
 
 ];
 
