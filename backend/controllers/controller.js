@@ -75,6 +75,7 @@ exports.addNewUser = async (req, reply) => {
     return User.save()
       .then((data) => {
         console.log('Saved new User ' + user.name + ' to the database.');
+
         return data;
       }).catch((err) => {
         return err;

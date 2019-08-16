@@ -19,11 +19,13 @@
   },
   "homepage": "https://github.com/bnjmnsbl/lora-datahub#readme",
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "boom": "^7.3.0",
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.0.0",
     "fastify": "^2.6.0",
     "fastify-cors": "^2.1.3",
+    "fastify-jwt": "^1.0.0",
     "fastify-swagger": "^2.4.0",
     "mongoose": "^5.6.1",
     "ttn": "^2.3.2"

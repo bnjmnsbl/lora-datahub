@@ -9,6 +9,10 @@ const fastify = require('fastify')({
   logger: true
 });
 
+fastify.register(require('fastify-jwt'), {
+  secret: 'supersecret'
+});
+
 // Regist CORS
 fastify.register(require('fastify-cors'), {});
 // Register Swagger
