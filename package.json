@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "go": "node ./fetch_script/fetch_ttn.js"
+    "go": "node ./fetch_script/fetch_async.js"
   },
   "repository": {
     "type": "git",
