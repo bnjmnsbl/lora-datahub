@@ -19,6 +19,11 @@ const routes = [
   },
   {
     method: 'GET',
+    url: '/api/devicename/:id',
+    handler: controller.getDeviceName
+  },
+  {
+    method: 'GET',
     url: '/api/payloads/:id',
     handler: controller.getPayloadsforDevice
   },

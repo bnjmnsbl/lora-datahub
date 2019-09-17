@@ -38,6 +38,16 @@ exports.getDevices = async (req, reply) => {
   }
 };
 
+exports.getDeviceName = async (req, reply) => {
+  try {
+    const id = req.params.id;
+    const device = await DeviceModel.findById(id);
+    return device;
+  } catch (err) {
+    throw boom.boomify(err);
+  }
+};
+
 exports.getPayloadsforDevice = async (req, reply) => {
   try {
     const devId = req.params.id;
