@@ -29,10 +29,17 @@ const db = require('../fetch_script/db');
 
 // Run the server!
 const start = async () => {
+
+  // changed adress to work with uberspace!
   try {
-    await fastify.listen(3000);
-    fastify.swagger();
-    fastify.log.info(`listening on ${fastify.server.address().port}`);
+    fastify.listen(3000, '0.0.0.0', function (err, address) {
+      if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+      }
+      fastify.swagger();
+      fastify.log.info(`server listening on ${address}`);
+    });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
