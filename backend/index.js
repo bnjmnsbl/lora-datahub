@@ -1,5 +1,6 @@
 // Require environment variables
 require('dotenv').config({path:__dirname+'/./../.env'});
+let fetchScript = require(__dirname+'/./../fetch_script/fetch_async.js');
 
 //Import Swagger Options
 const swagger = require('./config/swagger');
@@ -26,6 +27,9 @@ routes.forEach((route) => {
 
 // eslint-disable-next-line no-unused-vars
 const db = require('../fetch_script/db');
+
+//test: run fetch script from here:
+fetchScript.init();
 
 // Run the server!
 const start = async () => {

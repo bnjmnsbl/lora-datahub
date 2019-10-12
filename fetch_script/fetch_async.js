@@ -11,40 +11,76 @@ const config = require('./config.json'),
 
 
 async function main () {
+
   await Promise.all(config.map(async (el) => {
 
     const client = await ttn.data(el.appId, el.key);
 
     client
       .on('uplink', async function(devID, payload){
-        console.log('received ping by ' + devID);
+        console.log('Received an ping by ' + devID);
 
-        let app = await appExists(el.uniqueId);
+        saveToDB(el, devID, payload);
 
-        if (app) {
-          console.log('App found! Looking for Device');
-          let device = await deviceExists(app._id, devID);
-
-          if (device) {
-            // Device found, saving only payload
-            console.log('Device found');
-            await savePayload(device._id, payload.metadata.time, payload.payload_fields);
-
-          } else {
-            // Device not found, creating new device and save payload;
-            console.log('Device not found');
-            let device = await saveDevice(app._id, devID, payload.hardware_serial);
-            await savePayload(device._id, payload.metadata.time, payload.payload_fields);
-          }
-        } else {
-          console.log('App not found!');
-          let app = await saveApp(el);
-          let device = await saveDevice(app._id, devID, payload.hardware_serial);
-          await savePayload(device._id, payload.metadata.time, payload.payload_fields);
-        }
       });
   }));
 }
+
+
+/**
+ * Adds an additional TTN App without stopping the script.
+ *
+ * @appObject {Object} The new app object from config.json, needs at least { appId, key, uniqueId } values
+ * @returns {Object} If present, returns app. If not, returns undefined
+ */
+async function addNewApp(appObject) {
+  console.log('Adding a new TTN App with ID: ' + appObject.appId);
+  const client = await ttn.data(appObject.appId, appObject.key);
+
+  client
+    .on('uplink', async function(devID, payload){
+      console.log('Received an ping by the updated device ' + devID);
+
+      saveToDB(appObject, devID, payload);
+
+    });
+
+}
+
+
+/** saveToDB
+ *
+ * Handles all the writing to the MongoDB in an appropriate way
+ *
+ * @el {Object} The app object from config.json
+ * @devID {String} Device ID from TTN Uplink
+ * @payload {Object?} Payload from TTN Uplink
+ */
+async function saveToDB(el, devID, payload) {
+  let app = await appExists(el.uniqueId);
+
+  if (app) {
+    console.log('App found! Looking for Device');
+    let device = await deviceExists(app._id, devID);
+
+    if (device) {
+      console.log('Device found');
+      await savePayload(device._id, payload.metadata.time, payload.payload_fields);
+
+    } else {
+      console.log('Device not found');
+      let device = await saveDevice(app._id, devID, payload.hardware_serial);
+      await savePayload(device._id, payload.metadata.time, payload.payload_fields);
+    }
+  } else {
+    console.log('App not found!');
+    let app = await saveApp(el);
+    let device = await saveDevice(app._id, devID, payload.hardware_serial);
+    await savePayload(device._id, payload.metadata.time, payload.payload_fields);
+  }
+}
+
+
 
 /**
  * Checks if an App is already present in the MongoDB.
@@ -162,8 +198,11 @@ function savePayload(devId, time, fields){
  * Main function
  */
 
-main()
-  .catch(function (err) {
-    console.error(err);
-    process.exit(1);
-  });
+// main()
+//   .catch(function (err) {
+//     console.error(err);
+//     process.exit(1);
+//   });
+
+module.exports.init = main;
+module.exports.update = addNewApp;
