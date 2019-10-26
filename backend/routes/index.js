@@ -29,6 +29,11 @@ const routes = [
   },
   {
     method: 'GET',
+    url: '/api/latestpayloads/:id',
+    handler: controller.getLatestPayloads
+  },
+  {
+    method: 'GET',
     url: '/:uid',
     handler: controller.handle404
   },

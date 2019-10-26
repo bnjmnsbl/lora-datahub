@@ -58,6 +58,17 @@ exports.getPayloadsforDevice = async (req, reply) => {
   }
 };
 
+exports.getLatestPayloads = async (req, reply) => {
+  try {
+    const devId = req.params.id;
+    const payloads = await PayloadModel.find({'parentDevice': devId}).sort({ '_id': -1 }).limit(5);
+    return payloads;
+  } catch (err) {
+    throw boom.boomify(err);
+  }
+};
+
+
 exports.handle404 = async (req, reply) => {
   try {
     return boom.notFound('404 not found');
