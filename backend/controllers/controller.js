@@ -1,7 +1,5 @@
 /* eslint-disable no-unused-vars */
 const boom = require('boom');
-const bcrypt = require('bcrypt');
-
 
 const AppModel = require('../../models/App'),
   DeviceModel = require('../../models/Device'),
@@ -78,18 +76,20 @@ exports.handle404 = async (req, reply) => {
 
 };
 
+
+
 exports.addNewUser = async (req, reply) => {
-  try {
-    const user = req.body;
+  // try {
+  //   // const user = req.body;
 
-    const hashedPassword = await new Promise((resolve, reject) => {
-      bcrypt.hash(user.password, 10, function(err, hash) {
-        if (err) throw err;
-        resolve(hash);
-      });
-    });
+  //   // const hashedPassword = await new Promise((resolve, reject) => {
+  //   //   bcrypt.hash(user.password, 10, function(err, hash) {
+  //   //     if (err) throw err;
+  //   //     resolve(hash);
+  //   //   });
+  //   });
 
-    user.password = hashedPassword;
+    // user.password = hashedPassword;
 
     const User = new UserModel(user);
 
