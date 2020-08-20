@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/bnjmnsbl/lora-datahub#readme",
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "boom": "^7.3.0",
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.0.0",
